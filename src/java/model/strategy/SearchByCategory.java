@@ -5,10 +5,36 @@
  */
 package model.strategy;
 
+import java.util.ArrayList;
+import java.util.List;
+import model.entity.Event;
+
 /**
  *
  * @author user
  */
-public class SearchByCategory {
+public class SearchByCategory implements SearchStrategy {
+
+    @Override
+    public List<Event> search(List<Event> events, String keyword) {
+      List<Event> result = new ArrayList<Event>();
+
+        if (events == null || keyword == null) {
+            return result;
+        }
+
+        for (Event event : events) {
+            if (event.getCategory()!= null &&
+                event.getCategory().toString().contains(keyword.toLowerCase())) {
+                result.add(event);
+            }
+        }
+
+        return result;
+
+
+
+
+    }
     
 }

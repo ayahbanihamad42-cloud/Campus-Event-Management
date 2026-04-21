@@ -9,6 +9,10 @@ package model.entity;
  *
  * @author user
  */
-public class ClubSocialEvent {
+public class ClubSocialEvent extends Event{
+
+    public ClubSocialEvent() {
+        this.eventType="ClubSocial";
+    }
     
 }

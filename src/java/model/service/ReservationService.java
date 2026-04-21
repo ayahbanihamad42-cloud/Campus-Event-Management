@@ -5,10 +5,17 @@
  */
 package model.service;
 
+import java.util.List;
+import model.entity.Reservation;
+
 /**
  *
  * @author user
  */
 public class ReservationService {
+
+    public List<Reservation> getReservationsByEventId(int eventId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

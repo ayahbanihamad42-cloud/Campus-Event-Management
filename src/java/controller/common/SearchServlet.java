@@ -7,11 +7,14 @@ package controller.common;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import model.entity.Event;
+import model.service.SearchService;
 
 /**
  *
@@ -55,10 +58,21 @@ public class SearchServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+        private SearchService searchService = new SearchService();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        String searchBy = request.getParameter("searchBy");
+        String keyword = request.getParameter("keyword");
+
+        List<Event> events = searchService.searchEvents(searchBy, keyword);
+
+        request.setAttribute("events", events);
+        request.setAttribute("searchBy", searchBy);
+        request.setAttribute("keyword", keyword);
+
+        request.getRequestDispatcher("/View/Student/event.jsp").forward(request, response);
     }
 
     /**
@@ -72,7 +86,7 @@ public class SearchServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        doGet(request, response);
     }
 
     /**

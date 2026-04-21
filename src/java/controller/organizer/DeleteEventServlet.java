@@ -12,6 +12,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import model.service.EventService;
 
 /**
  *
@@ -55,11 +56,23 @@ public class DeleteEventServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+        private EventService eventService = new EventService();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            int eventId = Integer.parseInt(request.getParameter("id"));
+            String organizerName = request.getParameter("organizerName");
+
+            eventService.deleteEvent(eventId);
+            response.sendRedirect("ManageEventsServlet?organizerName=" + organizerName);
+        } catch (Exception e) {
+            response.sendRedirect("ManageEventsServlet");
+        }
     }
+    
+   
 
     /**
      * Handles the HTTP <code>POST</code> method.
@@ -72,7 +85,7 @@ public class DeleteEventServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        doGet(request, response);
     }
 
     /**

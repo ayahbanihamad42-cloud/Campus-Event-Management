@@ -9,6 +9,26 @@ package model.entity;
  *
  * @author user
  */
-public abstract class Category {
-    
+
+public enum Category {
+    EDUCATIONAL("Educational"),
+    SOCIAL("Social"),
+    SPORTS("Sports"),
+    CULTURAL("Cultural"),
+    TECHNICAL("Technical");
+
+    private final String displayName;
+
+    Category(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    @Override
+    public String toString() {
+        return displayName;
+    }
 }

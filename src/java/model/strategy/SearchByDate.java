@@ -5,10 +5,33 @@
  */
 package model.strategy;
 
+import java.util.ArrayList;
+import java.util.List;
+import model.entity.Event;
+
 /**
  *
  * @author user
  */
-public class SearchByDate {
+public class SearchByDate implements SearchStrategy{
+
+    @Override
+    public List<Event> search(List<Event> events, String keyword) {
+       List<Event> result = new ArrayList<Event>();
+
+        if (events == null || keyword == null) {
+            return result;
+        }
+
+        for (Event event : events) {
+            if (event.getEventDateTime() != null &&
+                event.getEventDateTime().toLocalDate().toString().equals(keyword)) {
+                result.add(event);
+            }
+        }
+
+        return result;
+
+    }
     
 }

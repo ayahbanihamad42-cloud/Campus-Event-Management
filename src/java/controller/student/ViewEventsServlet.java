@@ -7,11 +7,14 @@ package controller.student;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import model.entity.Event;
+import model.service.EventService;
 
 /**
  *
@@ -55,10 +58,24 @@ public class ViewEventsServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+        private EventService eventService = new EventService();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        String idParam = request.getParameter("id");
+
+        if (idParam != null && !idParam.trim().isEmpty()) {
+            int eventId = Integer.parseInt(idParam);
+            Event event = eventService.getEventById(eventId);
+            request.setAttribute("event", event);
+            request.getRequestDispatcher("/View/Student/eventDetails.jsp").forward(request, response);
+            return;
+        }
+
+        List<Event> events = eventService.getAllEvents();
+        request.setAttribute("events", events);
+        request.getRequestDispatcher("/View/Student/event.jsp").forward(request, response);
     }
 
     /**
@@ -72,7 +89,7 @@ public class ViewEventsServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        doGet(request, response);
     }
 
     /**
