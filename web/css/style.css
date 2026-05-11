@@ -1,0 +1,142 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : May 11, 2026, 9:01:01 PM
+    Author     : Lenovo
+*/
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f8;
+    color: #222;
+}
+
+.header {
+    background-color: #263746;
+    color: white;
+    padding: 24px;
+    text-align: center;
+}
+
+.header h1 {
+    margin: 0;
+}
+
+.container {
+    width: 85%;
+    margin: 35px auto;
+    background-color: white;
+    padding: 28px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.form-box {
+    width: 420px;
+    margin: 40px auto;
+    background-color: white;
+    padding: 28px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+label {
+    font-weight: bold;
+}
+
+input, select {
+    width: 100%;
+    padding: 9px;
+    margin-top: 6px;
+    margin-bottom: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button, input[type="submit"] {
+    background-color: #1e88e5;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover, input[type="submit"]:hover {
+    background-color: #1565c0;
+}
+
+.navbar {
+    background-color: white;
+    padding: 14px 30px;
+    border-bottom: 1px solid #ddd;
+}
+
+.navbar a {
+    margin-right: 18px;
+    color: #263746;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.navbar a:hover {
+    color: #1e88e5;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    margin-top: 25px;
+}
+
+.card {
+    background-color: #f9fbfd;
+    border: 1px solid #ddd;
+    padding: 22px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.card a {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 9px 14px;
+    background-color: #1e88e5;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th {
+    background-color: #263746;
+    color: white;
+    padding: 12px;
+}
+
+td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.action-link {
+    margin: 0 5px;
+    font-weight: bold;
+}
+
+.message {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    padding: 10px;
+    border-radius: 5px;
+}

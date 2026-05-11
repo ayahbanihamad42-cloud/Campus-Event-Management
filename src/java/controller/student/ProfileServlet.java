@@ -1,88 +1,80 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller.student;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import model.dao.UserDAO;
+import model.entity.User;
 
-/**
- *
- * @author user
- */
 @WebServlet(name = "ProfileServlet", urlPatterns = {"/ProfileServlet"})
 public class ProfileServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ProfileServlet</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet ProfileServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("userId") == null) {
+            response.sendRedirect("View/Auth/login.jsp");
+            return;
+        }
+
+        int userId = (Integer) session.getAttribute("userId");
+
+        UserDAO userDAO = new UserDAO();
+        User user = userDAO.getUserById(userId);
+
+        request.setAttribute("user", user);
+        request.getRequestDispatcher("View/Student/profile.jsp").forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("userId") == null) {
+            response.sendRedirect("View/Auth/login.jsp");
+            return;
+        }
+
+        int userId = (Integer) session.getAttribute("userId");
+
+        String name = request.getParameter("name");
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        String faculty = request.getParameter("faculty");
+        String department = request.getParameter("department");
+        int admissionYear = Integer.parseInt(request.getParameter("admissionYear"));
+
+        User user = new User();
+        user.setId(userId);
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setFaculty(faculty);
+        user.setDepartment(department);
+        user.setAdmissionYear(admissionYear);
+
+        UserDAO userDAO = new UserDAO();
+        boolean updated = userDAO.updateUserProfile(user);
+
+        if (updated) {
+            session.setAttribute("userName", name);
+            request.setAttribute("message", "Profile updated successfully");
+        } else {
+            request.setAttribute("message", "Profile update failed");
+        }
+
+        User updatedUser = userDAO.getUserById(userId);
+        request.setAttribute("user", updatedUser);
+
+        request.getRequestDispatcher("View/Student/profile.jsp").forward(request, response);
     }
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
 }

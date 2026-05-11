@@ -5,10 +5,14 @@
  */
 package model.strategy;
 
+import java.util.List;
+import model.entity.Event;
+
 /**
  *
  * @author user
  */
 public interface SearchStrategy {
-    
+        List<Event> search(List<Event> events, String keyword);
+
 }

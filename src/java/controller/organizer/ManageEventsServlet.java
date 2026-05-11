@@ -7,11 +7,17 @@ package controller.organizer;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import model.entity.Category;
+import model.entity.Event;
+import model.factory.EventFactory;
+import model.service.EventService;
 
 /**
  *
@@ -55,10 +61,24 @@ public class ManageEventsServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    private EventService eventService = new EventService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+            String organizerName = request.getParameter("organizerName");
+
+        if (organizerName == null || organizerName.trim().isEmpty()) {
+            organizerName = "Organizer";
+        }
+
+        List<Event> events = eventService.getEventsByOrganizer(organizerName);
+
+        request.setAttribute("events", events);
+        request.setAttribute("organizerName", organizerName);
+
+        request.getRequestDispatcher("/View/Organizer/manageEvents.jsp").forward(request, response);
+
+
     }
 
     /**
@@ -72,7 +92,54 @@ public class ManageEventsServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        
+        try {
+            String eventType = request.getParameter("eventType");
+            String title = request.getParameter("title");
+            String organizerName = request.getParameter("organizerName");
+            String description = request.getParameter("description");
+            String departmentClub = request.getParameter("departmentClub");
+            LocalDateTime eventDateTime = LocalDateTime.parse(request.getParameter("eventDateTime"));
+            String location = request.getParameter("location");
+            int capacity = Integer.parseInt(request.getParameter("capacity"));
+            Category category = Category.valueOf(request.getParameter("category"));
+            String imagePath = request.getParameter("imagePath");
+
+            Event event = EventFactory.createEvent(eventType);
+
+            if (event == null) {
+                request.setAttribute("errorMessage", "Invalid event type.");
+                request.getRequestDispatcher("/View/Organizer/createEvent.jsp").forward(request, response);
+                return;
+            }
+
+            event.setTitle(title);
+            event.setOrganizerName(organizerName);
+            event.setDescription(description);
+            event.setDepartmentClub(departmentClub);
+            event.setEventDateTime(eventDateTime);
+            event.setLocation(location);
+            event.setCapacity(capacity);
+            event.setCategory(category);
+            event.setImagePath(imagePath);
+            event.setStatus("Open");
+            event.setEventType(eventType);
+
+            boolean added = eventService.addEvent(event);
+
+            if (added) {
+                response.sendRedirect("ManageEventsServlet?organizerName=" + organizerName);
+            } else {
+                request.setAttribute("errorMessage", "Failed to create event.");
+                request.getRequestDispatcher("/View/Organizer/createEvent.jsp").forward(request, response);
+            }
+
+        } catch (Exception e) {
+            request.setAttribute("errorMessage", "Invalid input data.");
+            request.getRequestDispatcher("/View/Organizer/createEvent.jsp").forward(request, response);
+        }
+     
+
     }
 
     /**

@@ -8,40 +8,54 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Register</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
 <body>
-    <h2>Register</h2>
+
+<div class="header">
+    <h1>Campus Event Management System</h1>
+</div>
+
+<div class="form-box">
+    <h2>Create Account</h2>
 
     <form action="${pageContext.request.contextPath}/register" method="post">
-        <label>Name:</label><br>
-        <input type="text" name="name" required><br><br>
 
-        <label>Email:</label><br>
-        <input type="email" name="email" required><br><br>
+        <label>Name:</label>
+        <input type="text" name="name" required>
 
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
+        <label>Email:</label>
+        <input type="email" name="email" required>
 
-        <label>Faculty:</label><br>
-        <input type="text" name="faculty" required><br><br>
+        <label>Password:</label>
+        <input type="password" name="password" required>
 
-        <label>Department:</label><br>
-        <input type="text" name="department" required><br><br>
+        <label>Faculty:</label>
+        <input type="text" name="faculty" required>
 
-        <label>Admission Year:</label><br>
-        <input type="number" name="admissionYear" required><br><br>
+        <label>Department:</label>
+        <input type="text" name="department" required>
 
-        <label>Role:</label><br>
+        <label>Admission Year:</label>
+        <input type="number" name="admissionYear" required>
+
+        <label>Role:</label>
         <select name="role" required>
             <option value="student">Student</option>
             <option value="organizer">Organizer</option>
             <option value="admin">Admin</option>
-        </select><br><br>
+        </select>
 
         <button type="submit">Register</button>
     </form>
 
-    <p>Already have an account? <a href="login.jsp">Login</a></p>
+    <p>
+        Already have an account?
+        <a href="${pageContext.request.contextPath}/View/Auth/login.jsp">Login</a>
+    </p>
+</div>
+
 </body>
 </html>
