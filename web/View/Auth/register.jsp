@@ -41,13 +41,6 @@
         <label>Admission Year:</label>
         <input type="number" name="admissionYear" required>
 
-        <label>Role:</label>
-        <select name="role" required>
-            <option value="student">Student</option>
-            <option value="organizer">Organizer</option>
-            <option value="admin">Admin</option>
-        </select>
-
         <button type="submit">Register</button>
     </form>
 

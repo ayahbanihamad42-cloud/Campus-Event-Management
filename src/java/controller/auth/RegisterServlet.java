@@ -22,8 +22,7 @@ public class RegisterServlet extends HttpServlet {
         String faculty = request.getParameter("faculty");
         String department = request.getParameter("department");
         int admissionYear = Integer.parseInt(request.getParameter("admissionYear"));
-        String role = request.getParameter("role");
-
+           String role = "student";
         User user = new User();
         user.setName(name);
         user.setEmail(email);

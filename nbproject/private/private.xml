@@ -13,6 +13,19 @@
             <file>file:/C:/Users/Lenovo/OneDrive/Desktop/Campus-Event-Management/web/View/Student/dashboard.jsp</file>
             <file>file:/C:/Users/Lenovo/OneDrive/Desktop/Campus-Event-Management/web/View/Auth/login.jsp</file>
             <file>file:/C:/Users/Lenovo/OneDrive/Desktop/Campus-Event-Management/src/java/controller/auth/LoginServlet.java</file>
+            <file>file:/C:/Users/Lenovo/OneDrive/Desktop/Campus-Event-Management/web/View/Auth/register.jsp</file>
+            <file>file:/C:/Users/Lenovo/OneDrive/Desktop/Campus-Event-Management/web/WEB-INF/web.xml</file>
+            <file>file:/C:/Users/Lenovo/OneDrive/Desktop/Campus-Event-Management/src/java/filter/AuthFilter.java</file>
+            <file>file:/C:/Users/Lenovo/OneDrive/Desktop/Campus-Event-Management/src/java/filter/RoleFilter.java</file>
+            <file>file:/C:/Users/Lenovo/OneDrive/Desktop/Campus-Event-Management/web/View/Organizer/dashboard.jsp</file>
+            <file>file:/C:/Users/Lenovo/OneDrive/Desktop/Campus-Event-Management/src/java/controller/admin/ManageUsersServlet.java</file>
+            <file>file:/C:/Users/Lenovo/OneDrive/Desktop/Campus-Event-Management/src/java/controller/admin/BlockUserServlet.java</file>
+            <file>file:/C:/Users/Lenovo/OneDrive/Desktop/Campus-Event-Management/src/java/controller/admin/UnblockUserServlet.java</file>
+            <file>file:/C:/Users/Lenovo/OneDrive/Desktop/Campus-Event-Management/src/java/controller/admin/DeleteUserServlet.java</file>
+            <file>file:/C:/Users/Lenovo/OneDrive/Desktop/Campus-Event-Management/web/View/Admin/user.jsp</file>
+            <file>file:/C:/Users/Lenovo/OneDrive/Desktop/Campus-Event-Management/web/View/Admin/dashboard.jsp</file>
+            <file>file:/C:/Users/Lenovo/OneDrive/Desktop/Campus-Event-Management/src/java/DataBase/campus_event_db.sql</file>
+            <file>file:/C:/Users/Lenovo/OneDrive/Desktop/Campus-Event-Management/web/css/style.css</file>
         </group>
     </open-files>
 </project-private>
