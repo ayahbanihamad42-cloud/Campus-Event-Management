@@ -7,11 +7,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import model.dao.UserDAO;
 import model.entity.User;
+import model.service.ProfileService;
 
 @WebServlet(name = "ProfileServlet", urlPatterns = {"/ProfileServlet"})
 public class ProfileServlet extends HttpServlet {
+
+    private ProfileService profileService = new ProfileService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -20,17 +22,18 @@ public class ProfileServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute("userId") == null) {
-            response.sendRedirect("View/Auth/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/View/Auth/login.jsp");
             return;
         }
 
         int userId = (Integer) session.getAttribute("userId");
 
-        UserDAO userDAO = new UserDAO();
-        User user = userDAO.getUserById(userId);
+        User user = profileService.getUserById(userId);
 
         request.setAttribute("user", user);
-        request.getRequestDispatcher("View/Student/profile.jsp").forward(request, response);
+
+        request.getRequestDispatcher("/View/Student/profile.jsp")
+                .forward(request, response);
     }
 
     @Override
@@ -40,41 +43,45 @@ public class ProfileServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute("userId") == null) {
-            response.sendRedirect("View/Auth/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/View/Auth/login.jsp");
             return;
         }
 
         int userId = (Integer) session.getAttribute("userId");
 
-        String name = request.getParameter("name");
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-        String faculty = request.getParameter("faculty");
-        String department = request.getParameter("department");
-        int admissionYear = Integer.parseInt(request.getParameter("admissionYear"));
-
         User user = new User();
+
         user.setId(userId);
-        user.setName(name);
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setFaculty(faculty);
-        user.setDepartment(department);
-        user.setAdmissionYear(admissionYear);
+        user.setName(request.getParameter("name"));
+        user.setEmail(request.getParameter("email"));
+        user.setPassword(request.getParameter("password"));
+        user.setFaculty(request.getParameter("faculty"));
+        user.setDepartment(request.getParameter("department"));
 
-        UserDAO userDAO = new UserDAO();
-        boolean updated = userDAO.updateUserProfile(user);
-
-        if (updated) {
-            session.setAttribute("userName", name);
-            request.setAttribute("message", "Profile updated successfully");
-        } else {
-            request.setAttribute("message", "Profile update failed");
+        try {
+            user.setAdmissionYear(Integer.parseInt(request.getParameter("admissionYear")));
+        } catch (Exception e) {
+            user.setAdmissionYear(0);
         }
 
-        User updatedUser = userDAO.getUserById(userId);
+        boolean updated = profileService.updateProfile(user);
+
+        User updatedUser = profileService.getUserById(userId);
+
+        if (updatedUser != null) {
+            session.setAttribute("user", updatedUser);
+            session.setAttribute("userName", updatedUser.getName());
+        }
+
         request.setAttribute("user", updatedUser);
 
-        request.getRequestDispatcher("View/Student/profile.jsp").forward(request, response);
+        if (updated) {
+            request.setAttribute("message", "Profile updated successfully.");
+        } else {
+            request.setAttribute("message", "Profile update failed.");
+        }
+
+        request.getRequestDispatcher("/View/Student/profile.jsp")
+                .forward(request, response);
     }
 }

@@ -1,15 +1,3 @@
-<%-- 
-    Document   : profile
-    Created on : Apr 14, 2026, 11:38:28 PM
-    Author     : user
---%>
-
-<%-- 
-    Document   : profile
-    Created on : Apr 14, 2026, 11:38:28 PM
-    Author     : user
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="model.entity.User"%>
 
@@ -17,20 +5,15 @@
     User user = (User) request.getAttribute("user");
 
     if (user == null) {
+        user = (User) session.getAttribute("user");
+    }
+
+    if (user == null) {
         response.sendRedirect(request.getContextPath() + "/View/Auth/login.jsp");
         return;
     }
 
-    String role = (String) session.getAttribute("role");
-    String dashboardPath = "/View/Student/dashboard.jsp";
-
-    if (role != null) {
-        if (role.equalsIgnoreCase("admin")) {
-            dashboardPath = "/View/Admin/dashboard.jsp";
-        } else if (role.equalsIgnoreCase("organizer")) {
-            dashboardPath = "/View/Organizer/dashboard.jsp";
-        }
-    }
+    String message = (String) request.getAttribute("message");
 %>
 
 <!DOCTYPE html>
@@ -42,27 +25,15 @@
 </head>
 <body>
 
-    <div class="header">
-        <h1>My Profile</h1>
-    </div>
-
-    <div class="navbar">
-        <a href="<%= request.getContextPath() + dashboardPath %>">Dashboard</a>
-        <a href="<%= request.getContextPath() %>/ProfileServlet">My Profile</a>
-        <a href="<%= request.getContextPath() %>/View/Auth/login.jsp">Logout</a>
-    </div>
+    <jsp:include page="/View/common/header.jsp" />
+    <jsp:include page="/View/common/navbar.jsp" />
 
     <div class="form-box">
         <h2>Update Profile</h2>
 
-        <%
-            String message = (String) request.getAttribute("message");
-            if (message != null) {
-        %>
+        <% if (message != null) { %>
             <p class="message"><%= message %></p>
-        <%
-            }
-        %>
+        <% } %>
 
         <form action="<%= request.getContextPath() %>/ProfileServlet" method="post">
 
@@ -72,7 +43,7 @@
             <label>Email:</label>
             <input type="email" name="email" value="<%= user.getEmail() %>" required>
 
-            <label>Password:</label>
+           <label>Password:</label>
             <input type="password" name="password" value="<%= user.getPassword() %>" required>
 
             <label>Faculty:</label>
@@ -86,9 +57,6 @@
 
             <button type="submit">Update Profile</button>
         </form>
-
-        <br>
-        <a href="<%= request.getContextPath() + dashboardPath %>">Back to Dashboard</a>
     </div>
 
 </body>

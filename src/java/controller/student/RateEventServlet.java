@@ -1,88 +1,70 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller.student;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
+import model.dao.RatingDAO;
+import model.entity.Rating;
 
-/**
- *
- * @author user
- */
 @WebServlet(name = "RateEventServlet", urlPatterns = {"/RateEventServlet"})
 public class RateEventServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet RateEventServlet</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet RateEventServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
+    private RatingDAO ratingDAO = new RatingDAO();
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        String eventId = request.getParameter("eventId");
+
+        if (eventId == null || eventId.trim().isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/ViewEventsServlet");
+            return;
+        }
+
+        response.sendRedirect(request.getContextPath()
+                + "/View/Student/rateevent.jsp?eventId=" + eventId);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("userId") == null) {
+            response.sendRedirect(request.getContextPath() + "/View/Auth/login.jsp");
+            return;
+        }
+
+        try {
+            int userId = (Integer) session.getAttribute("userId");
+            int eventId = Integer.parseInt(request.getParameter("eventId"));
+            int ratingValue = Integer.parseInt(request.getParameter("ratingValue"));
+            String comment = request.getParameter("comment");
+
+            Rating rating = new Rating();
+
+            rating.setUserId(userId);
+            rating.setEventId(eventId);
+            rating.setRating(ratingValue);
+            rating.setComment(comment);
+
+            boolean saved = ratingDAO.addRating(rating);
+
+            if (saved) {
+                session.setAttribute("message", "Rating submitted successfully.");
+            } else {
+                session.setAttribute("message", "Rating failed.");
+            }
+
+            response.sendRedirect(request.getContextPath()
+                    + "/ViewEventsServlet?id=" + eventId);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.setAttribute("message", "Invalid rating data.");
+            response.sendRedirect(request.getContextPath() + "/ViewEventsServlet");
+        }
     }
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
 }

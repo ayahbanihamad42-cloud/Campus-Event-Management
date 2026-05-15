@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package filter;
 
 import java.io.IOException;
@@ -16,13 +11,12 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import model.entity.User;
 
-//@WebFilter(filterName = "RoleFilter", urlPatterns = {
-   // "/View/Student/*",
-   // "/View/Organizer/*",
-   // "/View/Admin/*"
-//})
+@WebFilter(filterName = "RoleFilter", urlPatterns = {
+    "/View/Student/*",
+    "/View/Organizer/*",
+    "/View/Admin/*"
+})
 public class RoleFilter implements Filter {
 
     @Override
@@ -38,13 +32,12 @@ public class RoleFilter implements Filter {
 
         HttpSession session = req.getSession(false);
 
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("role") == null) {
             res.sendRedirect(req.getContextPath() + "/View/Auth/login.jsp");
             return;
         }
 
-        User user = (User) session.getAttribute("user");
-        String role = user.getRole();
+        String role = session.getAttribute("role").toString();
         String uri = req.getRequestURI();
 
         if (uri.contains("/View/Admin/") && !"admin".equalsIgnoreCase(role)) {

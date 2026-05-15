@@ -9,6 +9,8 @@ package model.entity;
  *
  * @author user
  */
-public class Organizer {
-    
+public class Organizer extends User{
+     public Organizer() {
+        setRole("organizer");
+    }
 }

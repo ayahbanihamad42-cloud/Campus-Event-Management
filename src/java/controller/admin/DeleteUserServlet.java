@@ -11,20 +11,42 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import model.dao.UserDAO;
+import model.service.AdminService;
 
 @WebServlet("/DeleteUserServlet")
 public class DeleteUserServlet extends HttpServlet {
 
+    private AdminService adminService = new AdminService();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        int id = Integer.parseInt(request.getParameter("id"));
+        HttpSession session = request.getSession();
 
-        UserDAO userDAO = new UserDAO();
-        userDAO.deleteUser(id);
+        try {
+            int userId = Integer.parseInt(request.getParameter("id"));
+
+            boolean deleted = adminService.deleteUser(userId);
+
+            if (deleted) {
+                session.setAttribute("message", "User deleted successfully.");
+            } else {
+                session.setAttribute("message", "Failed to delete user.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.setAttribute("message", "Invalid user id.");
+        }
 
         response.sendRedirect(request.getContextPath() + "/ManageUsersServlet");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doGet(request, response);
     }
 }

@@ -5,14 +5,14 @@ import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-//@WebFilter("/*")
+@WebFilter("/*")
 public class AuthFilter implements Filter {
 
     @Override
@@ -29,13 +29,21 @@ public class AuthFilter implements Filter {
         String uri = req.getRequestURI();
         String contextPath = req.getContextPath();
 
+        boolean isHome = uri.equals(contextPath + "/")
+                || uri.equals(contextPath + "/index.jsp");
+
         boolean isLoginPage = uri.equals(contextPath + "/View/Auth/login.jsp");
         boolean isRegisterPage = uri.equals(contextPath + "/View/Auth/register.jsp");
-        boolean isLoginServlet = uri.equals(contextPath + "/login");
-        boolean isRegisterServlet = uri.equals(contextPath + "/register");
-        boolean isHomePage = uri.equals(contextPath + "/") || uri.equals(contextPath + "/index.jsp");
 
-        if (isLoginPage || isRegisterPage || isLoginServlet || isRegisterServlet || isHomePage) {
+        boolean isLoginServlet = uri.equals(contextPath + "/LoginServlet");
+        boolean isRegisterServlet = uri.equals(contextPath + "/register");
+
+        boolean isCss = uri.contains("/css/");
+        boolean isImage = uri.contains("/images/");
+
+        if (isHome || isLoginPage || isRegisterPage
+                || isLoginServlet || isRegisterServlet
+                || isCss || isImage) {
             chain.doFilter(request, response);
             return;
         }

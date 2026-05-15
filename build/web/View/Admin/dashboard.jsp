@@ -1,42 +1,43 @@
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/style.css">
 </head>
 <body>
 
-    <div class="header">
-        <h1>Admin Dashboard</h1>
-    </div>
-
-    <div class="navbar">
-        <a href="${pageContext.request.contextPath}/View/Admin/dashboard.jsp">Dashboard</a>
-        <a href="${pageContext.request.contextPath}/ManageUsersServlet">Manage Users</a>
-        <a href="${pageContext.request.contextPath}/View/Auth/login.jsp">Logout</a>
-    </div>
+    <jsp:include page="/View/common/header.jsp" />
+    <jsp:include page="/View/common/navbar.jsp" />
 
     <div class="container">
-        <h2>Welcome Admin</h2>
-        <p>Login successful! You can manage users and control user access from here.</p>
+        <h2>Admin Dashboard</h2>
+
+        <p>
+            Admin can manage users, events, departments, and categories.
+        </p>
 
         <div class="card-grid">
             <div class="card">
                 <h3>Manage Users</h3>
-                <p>View all users, block, unblock, or delete accounts.</p>
-                <a href="${pageContext.request.contextPath}/ManageUsersServlet">Open Users</a>
+                <a href="<%= request.getContextPath() %>/ManageUsersServlet">Open Users</a>
             </div>
 
             <div class="card">
-                <h3>User Roles</h3>
-                <p>Manage students, organizers, and admins in the system.</p>
+                <h3>Manage Events</h3>
+                <a href="<%= request.getContextPath() %>/ManageEventsAdminServlet">Open Events</a>
             </div>
 
             <div class="card">
-                <h3>Account Control</h3>
-                <p>Control active and blocked user accounts.</p>
+                <h3>Departments</h3>
+                <a href="<%= request.getContextPath() %>/ManageDepartmentsServlet">Open Departments</a>
+            </div>
+
+            <div class="card">
+                <h3>Categories</h3>
+                <a href="<%= request.getContextPath() %>/ManageCategoriesServlet">Open Categories</a>
             </div>
         </div>
     </div>

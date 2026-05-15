@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package model.service;
 
 import java.util.ArrayList;
@@ -10,12 +5,9 @@ import java.util.List;
 import model.dao.EventDAO;
 import model.entity.Event;
 
-/**
- *
- * @author user
- */
 public class EventService {
- private EventDAO eventDAO;
+
+    private EventDAO eventDAO;
 
     public EventService() {
         eventDAO = new EventDAO();
@@ -26,6 +18,10 @@ public class EventService {
             return false;
         }
         return eventDAO.addEvent(event);
+    }
+
+    public boolean createEvent(Event event) {
+        return addEvent(event);
     }
 
     public boolean updateEvent(Event event) {
@@ -56,24 +52,22 @@ public class EventService {
         return events != null ? events : new ArrayList<Event>();
     }
 
+    public List<Event> getEventsByOrganizerId(int organizerId) {
+        refreshExpiredEvents();
+        List<Event> events = eventDAO.getEventsByOrganizerId(organizerId);
+        return events != null ? events : new ArrayList<Event>();
+    }
+
     public boolean closeRegistration(int eventId) {
-        Event event = eventDAO.getEventById(eventId);
-
-        if (event == null) {
-            return false;
-        }
-
-        return eventDAO.updateEventStatus(eventId, "Closed");
+        return updateEventStatus(eventId, "Closed");
     }
 
     public boolean markCompleted(int eventId) {
-        Event event = eventDAO.getEventById(eventId);
+        return updateEventStatus(eventId, "Completed");
+    }
 
-        if (event == null) {
-            return false;
-        }
-
-        return eventDAO.updateEventStatus(eventId, "Completed");
+    public boolean updateEventStatus(int eventId, String status) {
+        return eventDAO.updateEventStatus(eventId, status);
     }
 
     public void refreshExpiredEvents() {
@@ -88,8 +82,9 @@ public class EventService {
                     && event.isExpired()
                     && !"Expired".equalsIgnoreCase(event.getStatus())
                     && !"Completed".equalsIgnoreCase(event.getStatus())) {
+
                 eventDAO.updateEventStatus(event.getId(), "Expired");
             }
         }
-    }   
+    }
 }

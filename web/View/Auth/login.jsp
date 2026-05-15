@@ -1,33 +1,45 @@
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
+
+<%
+    String errorMessage = (String) request.getAttribute("errorMessage");
+    String message = (String) request.getAttribute("message");
+%>
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/style.css">
 </head>
 <body>
 
-    <div class="header">
-        <h1>Campus Event Management System</h1>
-    </div>
+    <jsp:include page="/View/common/header.jsp" />
 
     <div class="form-box">
         <h2>Login</h2>
 
-        <form action="${pageContext.request.contextPath}/login" method="post">
+        <% if (errorMessage != null) { %>
+            <p class="error"><%= errorMessage %></p>
+        <% } %>
+
+        <% if (message != null) { %>
+            <p class="message"><%= message %></p>
+        <% } %>
+
+        <form action="<%= request.getContextPath() %>/LoginServlet" method="post">
             <label>Email:</label>
             <input type="email" name="email" required>
 
             <label>Password:</label>
             <input type="password" name="password" required>
 
-            <input type="submit" value="Login">
+            <button type="submit">Login</button>
         </form>
 
         <p>
             Don't have an account?
-            <a href="${pageContext.request.contextPath}/View/Auth/register.jsp">Register</a>
+            <a href="<%= request.getContextPath() %>/View/Auth/register.jsp">Register</a>
         </p>
     </div>
 

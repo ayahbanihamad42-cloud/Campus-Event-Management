@@ -5,10 +5,9 @@
  */
 package model.entity;
 
-/**
- *
- * @author user
- */
-public class Admin {
-    
+public class Admin extends User {
+
+    public Admin() {
+        setRole("admin");
+    }
 }

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller.admin;
 
 import java.io.IOException;
@@ -12,32 +7,22 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import model.service.AdminService;
 
-/**
- *
- * @author user
- */
 @WebServlet(name = "ManageDepartmentsServlet", urlPatterns = {"/ManageDepartmentsServlet"})
 public class ManageDepartmentsServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    private AdminService adminService = new AdminService();
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ManageDepartmentsServlet</title>");            
+            out.println("<title>Servlet ManageDepartmentsServlet</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet ManageDepartmentsServlet at " + request.getContextPath() + "</h1>");
@@ -46,43 +31,44 @@ public class ManageDepartmentsServlet extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        request.setAttribute("departments", adminService.getAllDepartments());
+
+        request.getRequestDispatcher("/View/Admin/department.jsp")
+                .forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+
+        HttpSession session = request.getSession();
+        String action = request.getParameter("action");
+
+        if ("add".equalsIgnoreCase(action)) {
+            String name = request.getParameter("name");
+
+            if (name != null && !name.trim().isEmpty()) {
+                adminService.addDepartment(name);
+                session.setAttribute("message", "Department added.");
+            }
+
+        } else if ("delete".equalsIgnoreCase(action)) {
+            String name = request.getParameter("name");
+
+            if (name != null && !name.trim().isEmpty()) {
+                adminService.deleteDepartmentByName(name);
+                session.setAttribute("message", "Department deleted.");
+            }
+        }
+
+        response.sendRedirect(request.getContextPath() + "/ManageDepartmentsServlet");
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
+        return "Manage Departments Servlet";
+    }
 }

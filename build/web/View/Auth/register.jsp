@@ -1,54 +1,66 @@
-<%-- 
-    Document   : register
-    Created on : Apr 14, 2026, 11:33:05 PM
-    Author     : user
---%>
-
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
+
+<%
+    String errorMessage = (String) request.getAttribute("errorMessage");
+    String message = (String) request.getAttribute("message");
+%>
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Register</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/style.css">
 </head>
 <body>
 
-<div class="header">
-    <h1>Campus Event Management System</h1>
-</div>
+    <jsp:include page="/View/common/header.jsp" />
 
-<div class="form-box">
-    <h2>Create Account</h2>
+    <div class="form-box">
+        <h2>Create Account</h2>
 
-    <form action="${pageContext.request.contextPath}/register" method="post">
+        <% if (errorMessage != null) { %>
+            <p class="error"><%= errorMessage %></p>
+        <% } %>
 
-        <label>Name:</label>
-        <input type="text" name="name" required>
+        <% if (message != null) { %>
+            <p class="message"><%= message %></p>
+        <% } %>
 
-        <label>Email:</label>
-        <input type="email" name="email" required>
+        <form action="<%= request.getContextPath() %>/register" method="post">
 
-        <label>Password:</label>
-        <input type="password" name="password" required>
+            <label>Name:</label>
+            <input type="text" name="name" required>
 
-        <label>Faculty:</label>
-        <input type="text" name="faculty" required>
+            <label>Email:</label>
+            <input type="email" name="email" required>
 
-        <label>Department:</label>
-        <input type="text" name="department" required>
+            <label>Password:</label>
+            <input type="password" name="password" required>
 
-        <label>Admission Year:</label>
-        <input type="number" name="admissionYear" required>
+            <label>Faculty:</label>
+            <input type="text" name="faculty" required>
 
-        <button type="submit">Register</button>
-    </form>
+            <label>Department:</label>
+            <input type="text" name="department" required>
 
-    <p>
-        Already have an account?
-        <a href="${pageContext.request.contextPath}/View/Auth/login.jsp">Login</a>
-    </p>
-</div>
+            <label>Admission Year:</label>
+            <input type="number" name="admissionYear" required>
+
+            <label>Role:</label>
+            <select name="role" required>
+                <option value="student">Student</option>
+                <option value="organizer">Organizer</option>
+            </select>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <p>
+            Already have an account?
+            <a href="<%= request.getContextPath() %>/View/Auth/login.jsp">Login</a>
+        </p>
+    </div>
 
 </body>
 </html>

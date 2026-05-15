@@ -1,162 +1,218 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller.organizer;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 import model.entity.Category;
 import model.entity.Event;
 import model.factory.EventFactory;
 import model.service.EventService;
 
-/**
- *
- * @author user
- */
 @WebServlet(name = "EditEventServlet", urlPatterns = {"/EditEventServlet"})
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024,
+        maxFileSize = 1024 * 1024 * 5,
+        maxRequestSize = 1024 * 1024 * 10
+)
 public class EditEventServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet EditEventServlet</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet EditEventServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     private EventService eventService = new EventService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-         String idParam = request.getParameter("id");
+        try {
+            int eventId = Integer.parseInt(request.getParameter("id"));
 
-        if (idParam == null || idParam.trim().isEmpty()) {
-            response.sendRedirect("ManageEventsServlet");
-            return;
+            Event event = eventService.getEventById(eventId);
+
+            request.setAttribute("event", event);
+
+            request.getRequestDispatcher("/View/Organizer/editEvent.jsp")
+                    .forward(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/ManageEventsServlet");
         }
-
-        int eventId = Integer.parseInt(idParam);
-        Event event = eventService.getEventById(eventId);
-
-        request.setAttribute("event", event);
-        request.getRequestDispatcher("/View/Organizer/editEvent.jsp").forward(request, response);
-
-
-
     }
-
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            int id = Integer.parseInt(request.getParameter("id"));
+            int eventId = Integer.parseInt(request.getParameter("id"));
             String eventType = request.getParameter("eventType");
-            String title = request.getParameter("title");
-            String organizerName = request.getParameter("organizerName");
-            String description = request.getParameter("description");
-            String departmentClub = request.getParameter("departmentClub");
-            LocalDateTime eventDateTime = LocalDateTime.parse(request.getParameter("eventDateTime"));
-            String location = request.getParameter("location");
-            int capacity = Integer.parseInt(request.getParameter("capacity"));
-            int reservedSeats = Integer.parseInt(request.getParameter("reservedSeats"));
-            Category category = Category.valueOf(request.getParameter("category"));
-            String imagePath = request.getParameter("imagePath");
-            String status = request.getParameter("status");
 
             Event event = EventFactory.createEvent(eventType);
 
             if (event == null) {
-                request.setAttribute("errorMessage", "Invalid event type.");
-                doGet(request, response);
-                return;
+                throw new IllegalArgumentException("Invalid event type.");
             }
 
-            event.setId(id);
-            event.setTitle(title);
-            event.setOrganizerName(organizerName);
-            event.setDescription(description);
-            event.setDepartmentClub(departmentClub);
-            event.setEventDateTime(eventDateTime);
-            event.setLocation(location);
-            event.setCapacity(capacity);
-            event.setReservedSeats(reservedSeats);
-            event.setCategory(category);
-            event.setImagePath(imagePath);
-            event.setStatus(status);
+            event.setId(eventId);
+            event.setTitle(request.getParameter("title"));
+            event.setOrganizerName(request.getParameter("organizerName"));
+            event.setDescription(request.getParameter("description"));
+            event.setDepartmentClub(request.getParameter("departmentClub"));
+            event.setEventDateTime(parseEventDateTime(request.getParameter("eventDateTime")));
+            event.setLocation(request.getParameter("location"));
+            event.setCapacity(Integer.parseInt(request.getParameter("capacity")));
+            event.setReservedSeats(Integer.parseInt(request.getParameter("reservedSeats")));
+            event.setCategory(parseCategory(request.getParameter("category")));
+            event.setStatus(request.getParameter("status"));
             event.setEventType(eventType);
+
+            Event oldEvent = eventService.getEventById(eventId);
+
+            if (oldEvent != null) {
+                event.setImagePath(oldEvent.getImagePath());
+            }
+
+            Part imagePart = request.getPart("eventImage");
+
+            if (imagePart != null && imagePart.getSize() > 0) {
+                String fileName = saveImage(imagePart);
+                event.setImagePath("images/" + fileName);
+            }
 
             boolean updated = eventService.updateEvent(event);
 
+            HttpSession session = request.getSession();
+
             if (updated) {
-                response.sendRedirect("ManageEventsServlet?organizerName=" + organizerName);
+                session.setAttribute("message", "Event updated successfully.");
             } else {
-                request.setAttribute("errorMessage", "Failed to update event.");
-                request.setAttribute("event", event);
-                request.getRequestDispatcher("/View/Organizer/editEvent.jsp").forward(request, response);
+                session.setAttribute("message", "Failed to update event.");
             }
 
+            response.sendRedirect(request.getContextPath() + "/ManageEventsServlet");
+
         } catch (Exception e) {
-            request.setAttribute("errorMessage", "Invalid input data.");
-            doGet(request, response);
+            e.printStackTrace();
+
+            request.setAttribute(
+                    "errorMessage",
+                    "Invalid event data: " + e.getClass().getSimpleName() + " - " + e.getMessage()
+            );
+
+            request.getRequestDispatcher("/View/Organizer/editEvent.jsp")
+                    .forward(request, response);
         }
-
-
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+    private String saveImage(Part imagePart) throws IOException {
+        String fileName = getFileName(imagePart);
 
+        String deployedRootPath = getServletContext().getRealPath("/");
+        File deployedRoot = new File(deployedRootPath);
+        File deployedImagesDir = new File(deployedRoot, "images");
+
+        if (!deployedImagesDir.exists()) {
+            deployedImagesDir.mkdirs();
+        }
+
+        File deployedImageFile = new File(deployedImagesDir, fileName);
+
+        InputStream inputStream = imagePart.getInputStream();
+
+        Files.copy(
+                inputStream,
+                deployedImageFile.toPath(),
+                StandardCopyOption.REPLACE_EXISTING
+        );
+
+        inputStream.close();
+
+        String sourceRootPath = deployedRootPath;
+
+        if (sourceRootPath.contains(File.separator + "build" + File.separator + "web")) {
+            sourceRootPath = sourceRootPath.replace(
+                    File.separator + "build" + File.separator + "web",
+                    File.separator + "web"
+            );
+
+            File sourceImagesDir = new File(sourceRootPath, "images");
+
+            if (!sourceImagesDir.exists()) {
+                sourceImagesDir.mkdirs();
+            }
+
+            File sourceImageFile = new File(sourceImagesDir, fileName);
+
+            Files.copy(
+                    deployedImageFile.toPath(),
+                    sourceImageFile.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING
+            );
+        }
+
+        System.out.println("IMAGE SAVED TO: " + deployedImageFile.getAbsolutePath());
+
+        return fileName;
+    }
+
+    private LocalDateTime parseEventDateTime(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalArgumentException("Event Date & Time is required.");
+        }
+
+        value = value.trim();
+
+        try {
+            return LocalDateTime.parse(value);
+        } catch (Exception e) {
+            // Try browser/local format
+        }
+
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm a");
+            return LocalDateTime.parse(value, formatter);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Event Date & Time format is invalid: " + value);
+        }
+    }
+
+    private Category parseCategory(String category) {
+        if (category == null || category.trim().isEmpty()) {
+            throw new IllegalArgumentException("Category is required.");
+        }
+
+        String value = category.trim().toUpperCase();
+
+        if ("EDUCATIONAL".equals(value)) {
+            return Category.EDUCATIONAL;
+        } else if ("SOCIAL".equals(value)) {
+            return Category.SOCIAL;
+        } else if ("SPORTS".equals(value)) {
+            return Category.SPORTS;
+        } else if ("CULTURAL".equals(value)) {
+            return Category.CULTURAL;
+        } else if ("TECHNICAL".equals(value)) {
+            return Category.TECHNICAL;
+        }
+
+        throw new IllegalArgumentException("Category is invalid: " + category);
+    }
+
+    private String getFileName(Part part) {
+        String submittedFileName = part.getSubmittedFileName();
+
+        if (submittedFileName == null || submittedFileName.trim().isEmpty()) {
+            return "event_image_" + System.currentTimeMillis() + ".png";
+        }
+
+        submittedFileName = submittedFileName.replace("\\", "/");
+        submittedFileName = submittedFileName.substring(submittedFileName.lastIndexOf("/") + 1);
+
+        return System.currentTimeMillis() + "_" + submittedFileName;
+    }
 }
