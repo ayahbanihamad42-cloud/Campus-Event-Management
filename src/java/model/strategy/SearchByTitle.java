@@ -1,40 +1,29 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package model.strategy;
 
 import java.util.ArrayList;
 import java.util.List;
 import model.entity.Event;
 
-/**
- *
- * @author user
- */
 public class SearchByTitle implements SearchStrategy {
 
     @Override
     public List<Event> search(List<Event> events, String keyword) {
-
-
         List<Event> result = new ArrayList<Event>();
 
-        if (events == null || keyword == null) {
+        if (events == null || keyword == null || keyword.trim().isEmpty()) {
             return result;
         }
 
+        String searchWord = keyword.trim().toLowerCase();
+
         for (Event event : events) {
-            if (event.getTitle() != null &&
-                event.getTitle().toLowerCase().contains(keyword.toLowerCase())) {
+            if (event != null
+                    && event.getTitle() != null
+                    && event.getTitle().toLowerCase().contains(searchWord)) {
                 result.add(event);
             }
         }
 
         return result;
-
-
     }
-    
 }

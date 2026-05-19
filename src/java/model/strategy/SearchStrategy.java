@@ -13,6 +13,6 @@ import model.entity.Event;
  * @author user
  */
 public interface SearchStrategy {
-        List<Event> search(List<Event> events, String keyword);
+    List<Event> search(List<Event> events, String keyword);
 
 }

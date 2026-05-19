@@ -4,6 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import model.dao.EventDAO;
 import model.entity.Event;
+import model.strategy.SearchByAvailability;
+import model.strategy.SearchByCategory;
+import model.strategy.SearchByDate;
+import model.strategy.SearchByDepartment;
+import model.strategy.SearchByTitle;
+import model.strategy.SearchByType;
+import model.strategy.SearchStrategy;
 
 public class SearchService {
 
@@ -13,64 +20,50 @@ public class SearchService {
         eventDAO = new EventDAO();
     }
 
-    public List<Event> searchEvents(String strategy, String keyword) {
-        List<Event> allEvents = eventDAO.getAllEvents();
-        List<Event> result = new ArrayList<Event>();
+    public List<Event> searchEvents(String strategyName, String keyword) {
+        List<Event> events = eventDAO.getAllEvents();
 
-        if (allEvents == null || strategy == null) {
-            return result;
+        if (events == null) {
+            return new ArrayList<Event>();
+        }
+
+        SearchStrategy strategy = getStrategy(strategyName);
+
+        if (strategy == null) {
+            return new ArrayList<Event>();
         }
 
         if (keyword == null) {
             keyword = "";
         }
 
-        keyword = keyword.trim().toLowerCase();
+        return strategy.search(events, keyword.trim());
+    }
 
-        for (Event event : allEvents) {
-            if (event == null) {
-                continue;
-            }
-
-            if ("title".equalsIgnoreCase(strategy)) {
-                if (event.getTitle() != null
-                        && event.getTitle().toLowerCase().contains(keyword)) {
-                    result.add(event);
-                }
-
-            } else if ("department".equalsIgnoreCase(strategy)) {
-                if (event.getDepartmentClub() != null
-                        && event.getDepartmentClub().toLowerCase().contains(keyword)) {
-                    result.add(event);
-                }
-
-            } else if ("date".equalsIgnoreCase(strategy)) {
-                if (event.getEventDateTime() != null
-                        && event.getEventDateTime().toLocalDate().toString().equals(keyword)) {
-                    result.add(event);
-                }
-
-            } else if ("category".equalsIgnoreCase(strategy)) {
-                if (event.getCategory() != null
-                        && event.getCategory().name().equalsIgnoreCase(keyword)) {
-                    result.add(event);
-                }
-
-            } else if ("type".equalsIgnoreCase(strategy)) {
-                if (event.getEventType() != null
-                        && event.getEventType().equalsIgnoreCase(keyword)) {
-                    result.add(event);
-                }
-
-            } else if ("availability".equalsIgnoreCase(strategy)) {
-                if (event.hasAvailableSeats()
-                        && "Open".equalsIgnoreCase(event.getStatus())
-                        && !event.isExpired()) {
-                    result.add(event);
-                }
-            }
+    private SearchStrategy getStrategy(String strategyName) {
+        if (strategyName == null) {
+            return null;
         }
 
-        return result;
+        if ("title".equalsIgnoreCase(strategyName)) {
+            return new SearchByTitle();
+
+        } else if ("department".equalsIgnoreCase(strategyName)) {
+            return new SearchByDepartment();
+
+        } else if ("date".equalsIgnoreCase(strategyName)) {
+            return new SearchByDate();
+
+        } else if ("category".equalsIgnoreCase(strategyName)) {
+            return new SearchByCategory();
+
+        } else if ("type".equalsIgnoreCase(strategyName)) {
+            return new SearchByType();
+
+        } else if ("availability".equalsIgnoreCase(strategyName)) {
+            return new SearchByAvailability();
+        }
+
+        return null;
     }
 }
