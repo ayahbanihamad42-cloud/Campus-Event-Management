@@ -1,60 +1,76 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package model.service;
 
 import java.util.ArrayList;
 import java.util.List;
 import model.dao.EventDAO;
 import model.entity.Event;
-import model.strategy.SearchByAvailability;
-import model.strategy.SearchByCategory;
-import model.strategy.SearchByDate;
-import model.strategy.SearchByDepartment;
-import model.strategy.SearchByTitle;
-import model.strategy.SearchByType;
-import model.strategy.SearchStrategy;
 
-/**
- *
- * @author user
- */
 public class SearchService {
+
     private EventDAO eventDAO;
 
     public SearchService() {
         eventDAO = new EventDAO();
     }
 
-    public List<Event> searchEvents(String searchBy, String keyword) {
-        List<Event> events = eventDAO.getAllEvents();
+    public List<Event> searchEvents(String strategy, String keyword) {
+        List<Event> allEvents = eventDAO.getAllEvents();
+        List<Event> result = new ArrayList<Event>();
 
-        if (events == null) {
-            return new ArrayList<Event>();
+        if (allEvents == null || strategy == null) {
+            return result;
         }
 
-        SearchStrategy strategy = null;
-
-        if ("title".equalsIgnoreCase(searchBy)) {
-            strategy = new SearchByTitle();
-        } else if ("department".equalsIgnoreCase(searchBy)) {
-            strategy = new SearchByDepartment();
-        } else if ("date".equalsIgnoreCase(searchBy)) {
-            strategy = new SearchByDate();
-        } else if ("category".equalsIgnoreCase(searchBy)) {
-            strategy = new SearchByCategory();
-        } else if ("type".equalsIgnoreCase(searchBy)) {
-            strategy = new SearchByType();
-        } else if ("availability".equalsIgnoreCase(searchBy)) {
-            strategy = new SearchByAvailability();
+        if (keyword == null) {
+            keyword = "";
         }
 
-        if (strategy == null) {
-            return events;
+        keyword = keyword.trim().toLowerCase();
+
+        for (Event event : allEvents) {
+            if (event == null) {
+                continue;
+            }
+
+            if ("title".equalsIgnoreCase(strategy)) {
+                if (event.getTitle() != null
+                        && event.getTitle().toLowerCase().contains(keyword)) {
+                    result.add(event);
+                }
+
+            } else if ("department".equalsIgnoreCase(strategy)) {
+                if (event.getDepartmentClub() != null
+                        && event.getDepartmentClub().toLowerCase().contains(keyword)) {
+                    result.add(event);
+                }
+
+            } else if ("date".equalsIgnoreCase(strategy)) {
+                if (event.getEventDateTime() != null
+                        && event.getEventDateTime().toLocalDate().toString().equals(keyword)) {
+                    result.add(event);
+                }
+
+            } else if ("category".equalsIgnoreCase(strategy)) {
+                if (event.getCategory() != null
+                        && event.getCategory().name().equalsIgnoreCase(keyword)) {
+                    result.add(event);
+                }
+
+            } else if ("type".equalsIgnoreCase(strategy)) {
+                if (event.getEventType() != null
+                        && event.getEventType().equalsIgnoreCase(keyword)) {
+                    result.add(event);
+                }
+
+            } else if ("availability".equalsIgnoreCase(strategy)) {
+                if (event.hasAvailableSeats()
+                        && "Open".equalsIgnoreCase(event.getStatus())
+                        && !event.isExpired()) {
+                    result.add(event);
+                }
+            }
         }
 
-        return strategy.search(events, keyword);
+        return result;
     }
 }
